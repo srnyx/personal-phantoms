@@ -1,5 +1,19 @@
-# Template
+# Personal Phantoms
 
-Public template repository used when I create a new repository for one of my projects. Feel free to use this or create a pull request to improve it!
+Plugin used for per-player phantom spawning/control. *Made for [GeekSMP](https://discord.gg/Ft6YB6yjAC) 3.0.*
 
-[![Codacy Badge](https://app.codacy.com/project/badge/Grade/d2231a402af840f3a564665440f1797a)](https://www.codacy.com/gh/srnyx/template/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=srnyx/template&amp;utm_campaign=Badge_Grade)
+## Commands
+
+- `/nophantoms [player]` - Toggle phantoms for yourself or another player
+
+## Permissions
+
+- `personalphantoms.nophantoms` - Allows you to use the `/nophantoms` command
+- `personalphantoms.nophantoms.others` - Allows you to use the `/nophantoms` command on other players
+- `personalphantoms.nophantoms.bypass` - Allows you to bypass the command cooldown for `/nophantoms`
+
+### Disclaimer
+
+I made this in a few hours so don't expect it to be perfect.
+
+I'd be happy to fix any bugs or add new features, just report them [here](https://github.com/srnyx/personal-phantoms/issues).

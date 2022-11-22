@@ -1,0 +1,25 @@
+name: PersonalPhantoms
+author: srnyx
+description: Plugin used for per-player phantom spawning/control
+
+main: xyz.srnyx.personalphantoms.Main
+version: ${version}
+api-version: 1.19
+
+commands:
+  nophantoms:
+    description: Disables phantoms for the player
+    aliases:
+      - nophantom
+      - phantoms
+      - phantom
+    permission: personalphantoms.nophantoms
+
+permissions:
+    personalphantoms.nophantoms:
+        description: Allows the player to disable phantoms
+        default: true
+    personalphantoms.nophantoms.others:
+        description: Allows the player to disable phantoms for other players
+    personalphantoms.nophantoms.bypass:
+        description: Allows the player to bypass the nophantoms command cooldown

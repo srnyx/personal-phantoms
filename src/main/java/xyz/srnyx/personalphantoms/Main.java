@@ -11,15 +11,12 @@ import java.util.logging.Logger;
 
 
 public class Main extends JavaPlugin {
-    public static Main plugin;
-
     /**
      * Called when this plugin is enabled
      */
     @Override
     public void onEnable() {
-        plugin = this;
-        FileManager.loadData();
+        new FileManager(this).loadData();
 
         // Start messages
         final StringBuilder authors = new StringBuilder();
@@ -51,6 +48,6 @@ public class Main extends JavaPlugin {
      */
     @Override
     public void onDisable() {
-        FileManager.saveData();
+        new FileManager(this).saveData();
     }
 }

@@ -2,6 +2,9 @@ package xyz.srnyx.personalphantoms.managers;
 
 import org.bukkit.configuration.file.YamlConfiguration;
 
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
+
 import xyz.srnyx.personalphantoms.Main;
 
 import java.io.File;
@@ -12,14 +15,20 @@ import java.util.UUID;
 
 @SuppressWarnings("ResultOfMethodCallIgnored")
 public class FileManager {
+    private final Main plugin;
+    @Contract(pure = true)
+    public FileManager(@NotNull Main plugin) {
+        this.plugin = plugin;
+    }
+
     public static YamlConfiguration data = new YamlConfiguration();
 
     /**
      * Loads the data.yml file
      */
-    public static void loadData() {
+    public void loadData() {
         try {
-            data = YamlConfiguration.loadConfiguration(new File(Main.plugin.getDataFolder(), "data.yml"));
+            data = YamlConfiguration.loadConfiguration(new File(plugin.getDataFolder(), "data.yml"));
             FileManager.data.getStringList("no-phantoms").forEach(uuid -> ListManager.list.add(UUID.fromString(uuid)));
         } catch (Exception ignored) {
             // ignored
@@ -29,11 +38,11 @@ public class FileManager {
     /**
      * Saves the data.yml file
      */
-    public static void saveData() {
+    public void saveData() {
         if (ListManager.list.isEmpty()) return;
 
         // Create plugin folder
-        final File pluginFolder = Main.plugin.getDataFolder();
+        final File pluginFolder = plugin.getDataFolder();
         if (!pluginFolder.exists()) pluginFolder.mkdir();
 
         // Save list to data
@@ -42,7 +51,7 @@ public class FileManager {
         data.set("no-phantoms", list);
 
         // Save data to file
-        final File dataFile = new File(Main.plugin.getDataFolder(), "data.yml");
+        final File dataFile = new File(plugin.getDataFolder(), "data.yml");
         try {
             dataFile.createNewFile();
             data.save(dataFile);

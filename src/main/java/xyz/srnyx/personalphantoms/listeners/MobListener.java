@@ -1,4 +1,4 @@
-package xyz.srnyx.personalphantoms;
+package xyz.srnyx.personalphantoms.listeners;
 
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -10,8 +10,6 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityTargetEvent;
 
 import org.jetbrains.annotations.NotNull;
-
-import xyz.srnyx.personalphantoms.managers.ListManager;
 
 
 public class MobListener implements Listener {
@@ -26,7 +24,7 @@ public class MobListener implements Listener {
         if (entity.getType() == EntityType.PHANTOM && event.getSpawnReason() == CreatureSpawnEvent.SpawnReason.NATURAL) {
             // Check if any nearby players have phantoms disabled
             if (entity.getNearbyEntities(100, 100, 100).stream()
-                    .anyMatch(nearby -> nearby instanceof Player player && ListManager.list.contains(player.getUniqueId()))) {
+                    .anyMatch(nearby -> nearby instanceof Player player && player.getScoreboardTags().contains("pp_no-phantoms"))) {
                 event.setCancelled(true);
             }
         }
@@ -37,7 +35,7 @@ public class MobListener implements Listener {
      */
     @EventHandler
     public void onEntityTarget(@NotNull EntityTargetEvent event) {
-        if (event.getEntity().getType() == EntityType.PHANTOM && event.getTarget() instanceof Player player && ListManager.list.contains(player.getUniqueId())) {
+        if (event.getEntity().getType() == EntityType.PHANTOM && event.getTarget() instanceof Player player && player.getScoreboardTags().contains("pp_no-phantoms")) {
             event.setCancelled(true);
         }
     }
@@ -50,8 +48,8 @@ public class MobListener implements Listener {
         final Entity entity = event.getEntity();
         final Entity damager = event.getDamager();
         // Player attacking Phantom
-        if (damager instanceof Player player && entity.getType() == EntityType.PHANTOM && ListManager.list.contains(player.getUniqueId())) event.setCancelled(true);
+        if (damager instanceof Player player && entity.getType() == EntityType.PHANTOM && player.getScoreboardTags().contains("pp_no-phantoms")) event.setCancelled(true);
         // Phantom attacking Player
-        if (damager.getType() == EntityType.PHANTOM && entity instanceof Player player && ListManager.list.contains(player.getUniqueId())) event.setCancelled(true);
+        if (damager.getType() == EntityType.PHANTOM && entity instanceof Player player && player.getScoreboardTags().contains("pp_no-phantoms")) event.setCancelled(true);
     }
 }

@@ -3,21 +3,26 @@ package xyz.srnyx.personalphantoms;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.PluginCommand;
+import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import xyz.srnyx.personalphantoms.managers.FileManager;
+import xyz.srnyx.personalphantoms.commands.NoPhantomsCommand;
+import xyz.srnyx.personalphantoms.listeners.MobListener;
+import xyz.srnyx.personalphantoms.listeners.PlayerListener;
 
+import java.io.File;
 import java.util.logging.Logger;
 
 
-public class Main extends JavaPlugin {
+public class PersonalPhantoms extends JavaPlugin {
+    public static YamlConfiguration oldData;
+
     /**
      * Called when this plugin is enabled
      */
     @Override
     public void onEnable() {
-        new FileManager(this).loadData();
-
         // Start messages
         final StringBuilder authors = new StringBuilder();
         boolean first = true;
@@ -35,19 +40,32 @@ public class Main extends JavaPlugin {
         logger.info(ChatColor.LIGHT_PURPLE + "    Created by " + authors);
         logger.info(ChatColor.DARK_PURPLE + "-------------------------");
 
-        // Event
-        Bukkit.getPluginManager().registerEvents(new MobListener(), this);
+        // Events
+        final PluginManager manager = Bukkit.getPluginManager();
+        manager.registerEvents(new MobListener(), this);
+        manager.registerEvents(new PlayerListener(this), this);
 
         // Command
         final PluginCommand command = Bukkit.getPluginCommand("nophantoms");
         if (command != null) command.setExecutor(new NoPhantomsCommand());
+
+        getOldData();
     }
 
     /**
-     * Called when this plugin is disabled
+     * Gets the plugin's old data {@link YamlConfiguration}
+     *
+     * @deprecated  this listener is only used for old data conversion
      */
-    @Override
-    public void onDisable() {
-        new FileManager(this).saveData();
+    @Deprecated(forRemoval = true, since = "1.0.1")
+    private void getOldData() {
+        // Get old data
+        final File oldFile = new File(getDataFolder(), "data.yml");
+        if (oldFile.exists()) {
+            oldData = YamlConfiguration.loadConfiguration(oldFile);
+        } else {
+            //noinspection ResultOfMethodCallIgnored
+            getDataFolder().delete();
+        }
     }
 }

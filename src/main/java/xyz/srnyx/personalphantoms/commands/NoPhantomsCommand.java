@@ -17,13 +17,13 @@ import java.util.concurrent.TimeUnit;
 public class NoPhantomsCommand implements CommandExecutor {
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String label, String[] args) {
         // Check permission
-        if (!sender.hasPermission("personalphantoms.nophantoms")) {
+        if (!sender.hasPermission("pp.nophantoms")) {
             sender.sendMessage(ChatColor.RED + "You do not have permission to use this command!");
             return true;
         }
 
         // nophantoms <player>
-        if (args.length == 1 && sender.hasPermission("personalphantoms.nophantoms.others")) {
+        if (args.length == 1 && sender.hasPermission("pp.nophantoms.others")) {
             final Player target = Bukkit.getPlayer(args[0]);
             if (target == null) {
                 sender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&4" + args[0] + "&c is an invalid player!"));

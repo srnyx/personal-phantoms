@@ -13,13 +13,13 @@ commands:
       - nophantom
       - phantoms
       - phantom
-    permission: personalphantoms.nophantoms
+    permission: pp.nophantoms
 
 permissions:
-    pp.nophantoms:
-        description: Allows the player to disable phantoms
-        default: true
-    pp.nophantoms.others:
-        description: Allows the player to disable phantoms for other players
-    pp.nophantoms.bypass:
-        description: Allows the player to bypass the nophantoms command cooldown
+  pp.nophantoms:
+    description: Allows the player to disable phantoms
+    default: true
+  pp.nophantoms.others:
+    description: Allows the player to disable phantoms for other players
+  pp.nophantoms.bypass:
+    description: Allows the player to bypass the nophantoms command cooldown

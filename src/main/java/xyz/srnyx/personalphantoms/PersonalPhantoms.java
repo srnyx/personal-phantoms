@@ -1,5 +1,7 @@
 package xyz.srnyx.personalphantoms;
 
+import org.apache.commons.lang3.StringUtils;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.PluginCommand;
@@ -25,21 +27,14 @@ public class PersonalPhantoms extends JavaPlugin {
     @Override
     public void onEnable() {
         // Start messages
-        final StringBuilder authors = new StringBuilder();
-        boolean first = true;
-        for (final String author : getDescription().getAuthors()) {
-            if (first) {
-                authors.append(author);
-                first = false;
-                continue;
-            }
-            authors.append(", ").append(author);
-        }
         final Logger logger = getLogger();
-        logger.info(ChatColor.DARK_PURPLE + "-------------------------");
-        logger.info(ChatColor.LIGHT_PURPLE + " " + getName() + " v" + getDescription().getVersion());
-        logger.info(ChatColor.LIGHT_PURPLE + "    Created by " + authors);
-        logger.info(ChatColor.DARK_PURPLE + "-------------------------");
+        final String name = getName() + " v" + getDescription().getVersion();
+        final String authors = "By " + String.join(", ", getDescription().getAuthors());
+        final String line = StringUtils.repeat("-", Math.max(name.length(), authors.length()));
+        logger.info(ChatColor.DARK_PURPLE + line);
+        logger.info(ChatColor.LIGHT_PURPLE + name);
+        logger.info(ChatColor.LIGHT_PURPLE + authors);
+        logger.info(ChatColor.DARK_PURPLE + line);
 
         // Events
         final PluginManager manager = Bukkit.getPluginManager();

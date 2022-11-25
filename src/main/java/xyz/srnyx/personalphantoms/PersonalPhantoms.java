@@ -12,6 +12,7 @@ import xyz.srnyx.personalphantoms.listeners.MobListener;
 import xyz.srnyx.personalphantoms.listeners.PlayerListener;
 
 import java.io.File;
+import java.nio.file.Files;
 import java.util.logging.Logger;
 
 
@@ -64,8 +65,11 @@ public class PersonalPhantoms extends JavaPlugin {
         if (oldFile.exists()) {
             oldData = YamlConfiguration.loadConfiguration(oldFile);
         } else {
-            //noinspection ResultOfMethodCallIgnored
-            getDataFolder().delete();
+            try {
+                Files.delete(getDataFolder().toPath());
+            } catch (final Exception ignored) {
+                //ignored
+            }
         }
     }
 }

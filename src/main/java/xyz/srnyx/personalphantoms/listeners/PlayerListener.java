@@ -10,6 +10,8 @@ import org.jetbrains.annotations.NotNull;
 
 import xyz.srnyx.personalphantoms.PersonalPhantoms;
 
+import java.nio.file.Files;
+
 
 /**
  * @deprecated  this listener is only used for old data conversion
@@ -39,9 +41,12 @@ public class PlayerListener implements Listener {
 
         // Delete data file if list is empty
         if (PersonalPhantoms.oldData.getStringList("no-phantoms").isEmpty()) {
-            //noinspection ResultOfMethodCallIgnored
-            plugin.getDataFolder().delete();
             PersonalPhantoms.oldData = null;
+            try {
+                Files.delete(plugin.getDataFolder().toPath());
+            } catch (final Exception ignored) {
+                //ignored
+            }
         }
     }
 }

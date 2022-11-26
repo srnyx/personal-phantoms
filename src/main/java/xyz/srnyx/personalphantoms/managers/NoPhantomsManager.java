@@ -31,10 +31,10 @@ public class NoPhantomsManager {
         String toggle;
         if (player.getScoreboardTags().contains("pp_no-phantoms")) {
             player.removeScoreboardTag("pp_no-phantoms");
-            toggle = "disabled";
+            toggle = "enabled";
         } else {
             player.addScoreboardTag("pp_no-phantoms");
-            toggle = "enabled";
+            toggle = "disabled";
         }
 
         // Messages

@@ -22,11 +22,9 @@ public class MobListener implements Listener {
         final Entity entity = event.getEntity();
         // Check if Phantom and spawn is natural
         if (entity.getType() == EntityType.PHANTOM && event.getSpawnReason() == CreatureSpawnEvent.SpawnReason.NATURAL) {
-            // Check if any nearby players have phantoms disabled
-            if (entity.getNearbyEntities(100, 100, 100).stream()
-                    .anyMatch(nearby -> nearby instanceof Player player && player.getScoreboardTags().contains("pp_no-phantoms"))) {
-                event.setCancelled(true);
-            }
+            // Check if any nearby players have phantoms disabled TODO: Find a better way to do this
+            if (entity.getNearbyEntities(10, 35, 10).stream()
+                    .anyMatch(nearby -> nearby instanceof Player && nearby.getScoreboardTags().contains("pp_no-phantoms"))) event.setCancelled(true);
         }
     }
 
@@ -35,9 +33,8 @@ public class MobListener implements Listener {
      */
     @EventHandler
     public void onEntityTarget(@NotNull EntityTargetEvent event) {
-        if (event.getEntity().getType() == EntityType.PHANTOM && event.getTarget() instanceof Player player && player.getScoreboardTags().contains("pp_no-phantoms")) {
-            event.setCancelled(true);
-        }
+        final Entity target = event.getTarget();
+        if (event.getEntity().getType() == EntityType.PHANTOM && target instanceof Player && target.getScoreboardTags().contains("pp_no-phantoms")) event.setCancelled(true);
     }
 
     /**
@@ -48,8 +45,8 @@ public class MobListener implements Listener {
         final Entity entity = event.getEntity();
         final Entity damager = event.getDamager();
         // Player attacking Phantom
-        if (damager instanceof Player player && entity.getType() == EntityType.PHANTOM && player.getScoreboardTags().contains("pp_no-phantoms")) event.setCancelled(true);
+        if (damager instanceof Player && entity.getType() == EntityType.PHANTOM && damager.getScoreboardTags().contains("pp_no-phantoms")) event.setCancelled(true);
         // Phantom attacking Player
-        if (damager.getType() == EntityType.PHANTOM && entity instanceof Player player && player.getScoreboardTags().contains("pp_no-phantoms")) event.setCancelled(true);
+        if (damager.getType() == EntityType.PHANTOM && entity instanceof Player && entity.getScoreboardTags().contains("pp_no-phantoms")) event.setCancelled(true);
     }
 }

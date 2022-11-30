@@ -1,7 +1,6 @@
 package xyz.srnyx.personalphantoms.commands;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -9,6 +8,7 @@ import org.bukkit.entity.Player;
 
 import org.jetbrains.annotations.NotNull;
 
+import xyz.srnyx.personalphantoms.PersonalPhantoms;
 import xyz.srnyx.personalphantoms.managers.NoPhantomsManager;
 
 import java.util.concurrent.TimeUnit;
@@ -18,7 +18,7 @@ public class NoPhantomsCommand implements CommandExecutor {
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String label, String[] args) {
         // Check permission
         if (!sender.hasPermission("pp.nophantoms")) {
-            sender.sendMessage(ChatColor.RED + "You do not have permission to use this command!");
+            PersonalPhantoms.sendMessage(sender, "&cYou do not have permission to use this command!");
             return true;
         }
 
@@ -26,7 +26,7 @@ public class NoPhantomsCommand implements CommandExecutor {
         if (args.length == 1 && sender.hasPermission("pp.nophantoms.others")) {
             final Player target = Bukkit.getPlayer(args[0]);
             if (target == null) {
-                sender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&4" + args[0] + "&c is an invalid player!"));
+                PersonalPhantoms.sendMessage(sender, "&4" + args[0] + "&c is an invalid player!");
                 return true;
             }
 
@@ -35,20 +35,20 @@ public class NoPhantomsCommand implements CommandExecutor {
         }
 
         // Check if player
-        if (!(sender instanceof Player player)) {
-            sender.sendMessage(ChatColor.RED + "You must be a player to use this command!");
+        if (!(sender instanceof Player)) {
+            PersonalPhantoms.sendMessage(sender, "&cYou must be a player to use this command!");
             return true;
         }
-        final NoPhantomsManager noPhantomsManager = new NoPhantomsManager(player);
+        final NoPhantomsManager manager = new NoPhantomsManager((Player) sender);
 
         // Check if on cooldown
-        if (noPhantomsManager.onCooldown()) {
-            sender.sendMessage(ChatColor.translateAlternateColorCodes('&',
-                    "&cYou must wait &4" + TimeUnit.MILLISECONDS.toSeconds(noPhantomsManager.getCooldownLeft()) + "&c seconds before using this command again!"));
+        if (manager.onCooldown()) {
+            PersonalPhantoms.sendMessage(sender,
+                    "&cYou must wait &4" + TimeUnit.MILLISECONDS.toSeconds(manager.getCooldownLeft()) + "&c seconds before using this command again!");
             return true;
         }
 
-        noPhantomsManager.togglePhantoms(null);
+        manager.togglePhantoms(null);
         return true;
     }
 }

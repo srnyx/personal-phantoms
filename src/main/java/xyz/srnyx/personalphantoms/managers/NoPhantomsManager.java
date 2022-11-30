@@ -1,12 +1,13 @@
 package xyz.srnyx.personalphantoms.managers;
 
-import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import xyz.srnyx.personalphantoms.PersonalPhantoms;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -41,9 +42,9 @@ public class NoPhantomsManager {
         String playerMessage = "&dPhantoms &5" + toggle;
         if (toggler != null) {
             playerMessage += " &dby &5" + toggler.getName();
-            toggler.sendMessage(ChatColor.translateAlternateColorCodes('&', "&dPhantoms &5" + toggle + " &dfor &5" + player.getName()));
+            PersonalPhantoms.sendMessage(toggler, "&dPhantoms &5" + toggle + " &dfor &5" + player.getName());
         }
-        player.sendMessage(ChatColor.translateAlternateColorCodes('&', playerMessage));
+        PersonalPhantoms.sendMessage(player, playerMessage);
 
         // Cooldown
         cooldowns.put(player.getUniqueId(), System.currentTimeMillis() + 30000);

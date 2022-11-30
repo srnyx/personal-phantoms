@@ -4,7 +4,7 @@ description: Plugin used for per-player phantom spawning/control
 
 main: xyz.srnyx.personalphantoms.PersonalPhantoms
 version: ${version}
-api-version: 1.19
+api-version: 1.13
 
 commands:
   nophantoms:

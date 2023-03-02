@@ -1,6 +1,8 @@
-name: PersonalPhantoms
-author: srnyx
+name: ${name}
 description: Plugin used for per-player phantom spawning/control
+authors:
+  - srnyx
+website: https://srnyx.xyz
 
 main: xyz.srnyx.personalphantoms.PersonalPhantoms
 version: ${version}

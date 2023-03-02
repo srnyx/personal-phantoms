@@ -21,13 +21,13 @@ jobs:
     runs-on: ubuntu-latest
     if: "!contains(github.event.commits[0].message, '[no-build]')"
     steps:
-      - uses: actions/checkout@v2
+      - uses: "actions/checkout@v3.1.0"
       - uses: gradle/wrapper-validation-action@v1
       - name: Set up JDK
         uses: actions/setup-java@v2
         with:
           distribution: temurin
-          java-version: 17
+          java-version: 8
           cache: gradle
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
@@ -36,7 +36,7 @@ jobs:
       - name: Build jar with Gradle
         run: ./gradlew build
       - name: Upload artifacts
-        uses: "actions/upload-artifact@v2.2.3"
+        uses: "actions/upload-artifact@v3.1.1"
         with:
-          name: Artifact
+          name: Personal Phantoms
           path: build/libs

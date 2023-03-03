@@ -2,18 +2,14 @@
 
 Plugin used for per-player phantom spawning/control. *Made for [GeekSMP](https://discord.gg/Ft6YB6yjAC) 3.0.*
 
-## Commands
+- **🐛 Bugs / 💡 Suggestions:** Please [open an issue](https://github.com/srnyx/personal-phantoms/issues/new/choose) to report a bug or suggest an idea
+- **🆘 Support:** Please [join the Discord](https://srnyx.xyz/discord) to get support
 
-- `/nophantoms [player]` - Toggle phantoms for yourself or another player
+## Download
 
-## Permissions
+- **✅ Stable:** You can download the latest **stable** version at [Modrinth](https://modrinth.com/plugin/personal-phantoms), [Polymart](https://polymart.org/resource/####), [Spigot](https://spigotmc.org/resources/106381), [BuiltByBit](https://builtbybit.com/resources/#####), or [Bukkit](https://dev.bukkit.org/projects/personal-phantoms)
+- **🚧 Snapshot:** You can download the latest **snapshot** version at [actions/workflows/build.yml](https://github.com/srnyx/personal-phantoms/actions/workflows/build.yml)
 
-- `personalphantoms.nophantoms` - Allows you to use the `/nophantoms` command
-- `personalphantoms.nophantoms.others` - Allows you to use the `/nophantoms` command on other players
-- `personalphantoms.nophantoms.bypass` - Allows you to bypass the command cooldown for `/nophantoms`
+# Wiki
 
-### Disclaimer
-
-I made this in a few hours so don't expect it to be perfect.
-
-I'd be happy to fix any bugs or add new features, just report them [here](https://github.com/srnyx/personal-phantoms/issues).
+For all information about the plugin (commands, permissions, etc...) please see the wiki at [github.com/srnyx/personal-phantoms/wiki](https://github.com/srnyx/personal-phantoms/wiki)

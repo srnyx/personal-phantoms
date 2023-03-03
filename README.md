@@ -7,7 +7,7 @@ Plugin used for per-player phantom spawning/control. *Made for [GeekSMP](https:/
 
 ## Download
 
-- **✅ Stable:** You can download the latest **stable** version at [Modrinth](https://modrinth.com/plugin/personal-phantoms), [Polymart](https://polymart.org/resource/####), [Spigot](https://spigotmc.org/resources/106381), [BuiltByBit](https://builtbybit.com/resources/#####), or [Bukkit](https://dev.bukkit.org/projects/personal-phantoms)
+- **✅ Stable:** You can download the latest **stable** version at [Modrinth](https://modrinth.com/plugin/personal-phantoms), [Polymart](https://polymart.org/resource/3597), [Spigot](https://spigotmc.org/resources/106381), [BuiltByBit](https://builtbybit.com/resources/27430), or [Bukkit](https://dev.bukkit.org/projects/personal-phantoms)
 - **🚧 Snapshot:** You can download the latest **snapshot** version at [actions/workflows/build.yml](https://github.com/srnyx/personal-phantoms/actions/workflows/build.yml)
 
 # Wiki

@@ -1,84 +1,5 @@
-# --- JSON COMPONENTS --- #
-# There are 5 different types of JSON components that can be used to send messages (each one can have hover text).
-# Each one will perform a different action when hovered over or clicked:
-# - "text"    [HOVER] Shows text, this is the default type
-# - "suggest" [CLICK] Puts text in the player's chat box
-# - "copy"    [CLICK] Copies text to the player's clipboard
-# - "chat"    [CLICK] Forces the player to send a message ("/" can be prefixed to make the player run a command)
-# - "web"     [CLICK] Prompts the player to open a URL in their browser
-#
-# The characters you put in plugin.splitters.json are used to split the message into the component arguments.
-# By default, the splitter is "@@", which is what will be used in the examples below.
-#
-# This is the format of a single message, all single messages are "prompt" components:
-key1: "display1@@hover1@@prompt1"
-  # Sent to player: "display1"
-  # Shown on hover: "hover1"
-  # Put in player's chat bar when clicked: "prompt1"
-#
-# "display1" cannot be empty. If it is, the key name will be sent (ex: "plugin.prefix").
-# "hover1" can be empty. If it is, a normal (non-JSON) message will be sent.
-# "prompt1" can be empty. If it is, a "text" message will be sent.
-#
-# These are the formats of an advanced message, all advanced message components depend on what they're sub-key start with:
-key2:
-  text: "display2@@hover2"
-    # Sent to player: "display2"
-    # Shown on hover: "hover2"
-  suggest: "display3@@hover3@@prompt2"
-    # Sent to player: "display3"
-    # Shown on hover: "hover3"
-    # Put in player's chat bar when clicked: "prompt2"
-  copy: "display4@@hover4@@clipboard1"
-    # Sent to player: "display4"
-    # Shown on hover: "hover4"
-    # Copied to player's clipboard when clicked: "clipboard1"
-  chat: "display5@@hover5@@chat1"
-    # Sent to player: "display5"
-    # Shown on hover: "hover5"
-    # Chat message sent by player when clicked: "chat1"
-  web: "display6@@hover6@@web1"
-    # Sent to player: "display6"
-    # Shown on hover: "hover6"
-    # Website prompted to open when clicked: "web1"
-#
-# All the messages in the above example will be strung together into a single message, "display1display2display3display4display5display6display7"
-#
-# This way you can create something like this: "[Accept][Decline]". When clicking on one of the options, it can run different functions/commands.
-# To have multiple of the same components in a message, you simply have to put any text after the component's name:
-key3:
-  command-accept: "[Accept]@@Accept the request@@/accept"
-  command-decline: "[Decline]@@Decline the request@@/deny"
-# The name of a "text" sub-key doesn't matter since it's the default component (just don't have it start with another component's name).
-# --- END JSON COMPONENTS --- #
-#
-# --- PLACEHOLDER PARAMETERS --- #
-# *Some* placeholders will allow you to input a parameter. These parameters are used to change the output of the placeholder
-# To input a parameter, you simply put it after the placeholder name (inside the %%), separated by the "plugin.splitters.placeholder" (default: "==")
-# Example: "%placeholder==parameter%"
-# Below are the different types of parameters that can be used...
-# The examples will use "==" as the splitter, but you can change it by modifying "plugin.splitters.placeholder"
-#
-# - time: A time (milliseconds) will be inputted by the plugin. The parameter will determine the format of the time.
-# Docs: https://commons.apache.org/proper/commons-lang/apidocs/org/apache/commons/lang3/time/DurationFormatUtils.html
-# Examples (5400000): "%cooldown==m':'s%" -> "1:30", "%cooldown==H':'m':'s%" -> "1:30:0", "%cooldown==d'd' H'h' m'm' s's'%" -> "1h 30m 0s"
-#
-# - number: A number will be inputted by the plugin. The parameter will determine the format of the number.
-# Docs: https://docs.oracle.com/javase/7/docs/api/java/text/DecimalFormat.html
-# Examples (8637.2): "%money==#,###%" -> "8,637", "%money==#,###.##%" -> "8,637.2", "%money==#,###.00%" -> "8,637.20"
-#
-# - boolean: A boolean (true/false) will be inputted by the plugin. The parameter will determine the output of the boolean.
-# Docs: You must use '//' to split the true and false outputs. If you don't, the placeholder will be replaced with "true" or "false".
-# Examples (true): "%state==enabled//disabled%" -> "enabled", "%state==yes//no%" -> "yes", "%state==on//off%" -> "on"
-#
-# Placeholders that support parameters will be displayed as "%name==type%" in the message's placeholder list.
-# Examples: "%cooldown=time%, %money=number%", "%state=boolean%"
-key4: "KDR: %kdr==#.##%" # %kdr==number%
-# --- END PLACEHOLDER PARAMETERS --- #
+DOCUMENTATION: https://annoying-api.srnyx.com/wiki/messages-file
 
-
-# This message can be used to test practically anything! FOR PLUGIN DEVELOPERS!
-test: "%prefix%This is a test message!"
 
 # Messages for general plugin usage
 plugin:
@@ -95,10 +16,13 @@ plugin:
 
   # These are the different splitters for messages/placeholders
   splitters:
-    # This is the splitter for the JSON components (see above). Default: "@@"
+    # This is the splitter for the JSON components. Default: "@@"
     json: "@@"
-    # This is the splitter for the placeholders. Default: "=="
+    # This is the splitter for placeholders with parameters. Default: "=="
     placeholder: "=="
+
+  # Message sent in the console when an update for the plugin is available
+  update-available: "%pe%A new version of %se%%plugin%%pe% is available! | Current: %se%%current%%pe% | New: %se%%new%" # %plugin%, %current%, %new%
 
 # Error messages when a player does something wrong
 error:
@@ -118,8 +42,8 @@ nophantoms:
   # Sent to the player when they're on cooldown
   cooldown: "%prefix%%sp%You can't use this command for another %se%%cooldown==s%%sp% seconds!@@%sp%%command%@@%command%" # %cooldown==time%
   # Sent to the player when they run /nophantoms
-  self: "%prefix%You have %s%%status%%p% phantoms!@@%p%%command%@@%command%" # %status%
+  self: "%prefix%You have %s%%status==enabled//disabled%%p% phantoms!@@%p%%command%@@%command%" # %status==boolean%
   # Sent to the player that runs /nophantoms <player>
-  toggler: "%prefix%You have %s%%status%%p% phantoms for %s%%target%@@%p%%command%@@%command%" # %status%, %target%
+  toggler: "%prefix%You have %s%%status==enabled//disabled%%p% phantoms for %s%%target%@@%p%%command%@@%command%" # %status==boolean%, %target%
   # Sent to the target of /nophantoms <player>
-  other: "%prefix%%s%%toggler%%p% has %s%%status%%p% phantoms for you@@%p%%command%@@%command%" # %toggler%, %status%
+  other: "%prefix%%s%%toggler%%p% has %s%%status==enabled//disabled%%p% phantoms for you@@%p%%command%@@%command%" # %toggler%, %status==boolean%

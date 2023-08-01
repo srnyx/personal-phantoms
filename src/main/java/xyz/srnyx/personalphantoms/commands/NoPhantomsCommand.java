@@ -1,32 +1,36 @@
-package xyz.srnyx.personalphantoms;
+package xyz.srnyx.personalphantoms.commands;
 
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import xyz.srnyx.annoyingapi.AnnoyingCooldown;
-import xyz.srnyx.annoyingapi.AnnoyingMessage;
-import xyz.srnyx.annoyingapi.AnnoyingUtility;
 import xyz.srnyx.annoyingapi.command.AnnoyingCommand;
 import xyz.srnyx.annoyingapi.command.AnnoyingSender;
+import xyz.srnyx.annoyingapi.data.EntityData;
+import xyz.srnyx.annoyingapi.message.AnnoyingMessage;
+import xyz.srnyx.annoyingapi.message.DefaultReplaceType;
+import xyz.srnyx.annoyingapi.utility.BukkitUtility;
 
-import java.util.Collection;
+import xyz.srnyx.personalphantoms.PersonalPhantoms;
+
+import java.util.Set;
 
 
 public class NoPhantomsCommand implements AnnoyingCommand {
+    @NotNull private static final AnnoyingCooldown.CooldownType COOLDOWN_TYPE = () -> 30000;
+
     @NotNull private final PersonalPhantoms plugin;
 
-    @Contract(pure = true)
     public NoPhantomsCommand(@NotNull PersonalPhantoms plugin) {
         this.plugin = plugin;
     }
 
     @Override @NotNull
-    public PersonalPhantoms getPlugin() {
+    public PersonalPhantoms getAnnoyingPlugin() {
         return plugin;
     }
 
@@ -43,27 +47,21 @@ public class NoPhantomsCommand implements AnnoyingCommand {
         if (args.length == 1 && cmdSender.hasPermission("pp.nophantoms.others")) {
             final Player target = Bukkit.getPlayer(args[0]);
             if (target == null) {
-                new AnnoyingMessage(plugin, "error.invalid-argument")
-                        .replace("%argument%", args[0])
-                        .send(sender);
+                sender.invalidArgument(args[0]);
                 return;
             }
-
             togglePhantoms(new AnnoyingSender(plugin, target), sender);
             return;
         }
 
         // Check if player
-        if (!(cmdSender instanceof Player)) {
-            new AnnoyingMessage(plugin, plugin.options.playerOnly).send(sender);
-            return;
-        }
+        if (!sender.checkPlayer()) return;
 
         // Check if on cooldown
-        final AnnoyingCooldown cooldown = new AnnoyingCooldown(plugin, sender.getPlayer().getUniqueId(), CooldownType.NO_PHANTOMS);
+        final AnnoyingCooldown cooldown = new AnnoyingCooldown(plugin, sender.getPlayer().getUniqueId(), COOLDOWN_TYPE);
         if (!cmdSender.hasPermission("pp.nophantoms.bypass") && cooldown.isOnCooldown()) {
             new AnnoyingMessage(plugin, "nophantoms.cooldown")
-                    .replace("%cooldown%", cooldown.getRemaining(), AnnoyingMessage.DefaultReplaceType.TIME)
+                    .replace("%cooldown%", cooldown.getRemaining(), DefaultReplaceType.TIME)
                     .send(sender);
             return;
         }
@@ -72,14 +70,13 @@ public class NoPhantomsCommand implements AnnoyingCommand {
     }
 
     @Override @Nullable
-    public Collection<String> onTabComplete(@NotNull AnnoyingSender sender) {
-        return AnnoyingUtility.getOnlinePlayerNames();
+    public Set<String> onTabComplete(@NotNull AnnoyingSender sender) {
+        return BukkitUtility.getOnlinePlayerNames();
     }
 
     /**
      * Toggles the player's phantom status
      *
-     * @param   plugin  the plugin instance
      * @param   sender  the player to toggle phantom status for
      * @param   toggler the {@link AnnoyingSender} toggling the player's phantom status
      */
@@ -87,32 +84,31 @@ public class NoPhantomsCommand implements AnnoyingCommand {
         final Player player = sender.getPlayer();
 
         // Cooldown
-        new AnnoyingCooldown(plugin, player.getUniqueId(), CooldownType.NO_PHANTOMS).start();
+        new AnnoyingCooldown(plugin, player.getUniqueId(), COOLDOWN_TYPE).start();
 
-        // Get status
-        final String status;
-        if (player.getScoreboardTags().contains("pp_no-phantoms")) {
-            player.removeScoreboardTag("pp_no-phantoms");
-            status = "enabled";
+        // Toggle
+        final EntityData data = new EntityData(plugin, player);
+        final boolean newStatus = !data.has(PersonalPhantoms.KEY);
+        if (!newStatus) {
+            data.remove(PersonalPhantoms.KEY);
         } else {
-            player.addScoreboardTag("pp_no-phantoms");
-            status = "disabled";
+            data.set(PersonalPhantoms.KEY, true);
         }
 
         // Messages
-        if (toggler != null) {
-            new AnnoyingMessage(plugin, "nophantoms.other")
-                    .replace("%status%", status)
-                    .replace("%toggler%", toggler.cmdSender.getName())
+        if (toggler == null) {
+            new AnnoyingMessage(plugin, "nophantoms.self")
+                    .replace("%status%", newStatus, DefaultReplaceType.BOOLEAN)
                     .send(sender);
-            new AnnoyingMessage(plugin, "nophantoms.toggler")
-                    .replace("%target%", player.getName())
-                    .replace("%status%", status)
-                    .send(toggler);
             return;
         }
-        new AnnoyingMessage(plugin, "nophantoms.self")
-                .replace("%status%", status)
+        new AnnoyingMessage(plugin, "nophantoms.other")
+                .replace("%status%", newStatus, DefaultReplaceType.BOOLEAN)
+                .replace("%toggler%", toggler.cmdSender.getName())
                 .send(sender);
+        new AnnoyingMessage(plugin, "nophantoms.toggler")
+                .replace("%target%", player.getName())
+                .replace("%status%", newStatus, DefaultReplaceType.BOOLEAN)
+                .send(toggler);
     }
 }

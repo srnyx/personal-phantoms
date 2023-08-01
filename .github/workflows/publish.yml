@@ -1,0 +1,15 @@
+name: Publish
+on:
+  release:
+    types:
+      - released
+  workflow_dispatch:
+
+jobs:
+  publish:
+    uses: srnyx/tools/.github/workflows/publish.yml@main
+    with:
+      versions: ">=1.13"
+      modrinth: lzjYdd5h
+      curseforge: 719645
+    secrets: inherit

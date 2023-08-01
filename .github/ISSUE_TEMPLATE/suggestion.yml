@@ -2,8 +2,6 @@ name: 💡 Make a suggestion
 description: Suggest a change on the current behavior, a completely new feature, or something else.
 labels: 
   - enhancement
-assignees:
-  - srnyx
 body:
   - type: textarea
     attributes:

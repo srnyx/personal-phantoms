@@ -40,6 +40,8 @@ public class MobListener implements AnnoyingListener {
         if (entity.getType() == EntityType.PHANTOM
                 // Check if natural spawn
                 && event.getSpawnReason() == CreatureSpawnEvent.SpawnReason.NATURAL
+                // Check if plugin enabled in world
+                && (plugin.worldsBlacklist == null || plugin.worldsBlacklist.contains(entity.getWorld().getName()) != plugin.treatBlacklistAsWhitelist)
                 // Check if any nearby players have phantoms disabled TODO: Find a better way to do this
                 && entity.getNearbyEntities(10, 35, 10).stream().anyMatch(nearby -> nearby instanceof Player && new EntityData(plugin, nearby).has(PersonalPhantoms.KEY))) event.setCancelled(true);
     }

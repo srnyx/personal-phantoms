@@ -1,0 +1,8 @@
+# A list of worlds where the plugin won't be enabled
+worlds-blacklist:
+  list:
+    - "disable_plugin1"
+    - "disable_plugin2"
+
+  # If true, the list of worlds above will act as a whitelist, meaning only those worlds will have the plugin enabled
+  act-as-whitelist: false

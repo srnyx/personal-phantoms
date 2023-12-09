@@ -37,13 +37,14 @@ error:
   # Command is used when it's disabled
   disabled-command: "%prefix%%se%%command%%pe% is disabled!@@%pe%%command%@@%command%"
 
-# Messages for /nophantoms
+reload: "%prefix%Reloaded the plugin!@@%command%@@%command%"
+
 nophantoms:
-  # Sent to the player when they're on cooldown
-  cooldown: "%prefix%%sp%You can't use this command for another %se%%cooldown==s%%sp% seconds!@@%sp%%command%@@%command%" # %cooldown==time%
-  # Sent to the player when they run /nophantoms
-  self: "%prefix%You have %s%%status==enabled//disabled%%p% phantoms!@@%p%%command%@@%command%" # %status==boolean%
-  # Sent to the player that runs /nophantoms <player>
+  cooldown: "%prefix%%pe%You can't use this command for another %se%%cooldown==s%%pe% seconds!@@%se%%command%@@%command%" # %cooldown==time%
+  self: "%prefix%You have %s%%status==enabled//disabled%%p% phantoms@@%p%%command%@@%command%" # %status==boolean%
   toggler: "%prefix%You have %s%%status==enabled//disabled%%p% phantoms for %s%%target%@@%p%%command%@@%command%" # %status==boolean%, %target%
-  # Sent to the target of /nophantoms <player>
   other: "%prefix%%s%%toggler%%p% has %s%%status==enabled//disabled%%p% phantoms for you@@%p%%command%@@%command%" # %toggler%, %status==boolean%
+
+get: # %phantoms==boolean%
+  self: "%prefix%%p%You have phantoms %s%%status==enabled//disabled%@@%p%%command%@@%command%"
+  other: "%prefix%%s%%target%%p% has phantoms %s%%status==enabled//disabled%@@%p%%command%@@%command%" # %target%

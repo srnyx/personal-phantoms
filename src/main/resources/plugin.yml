@@ -13,11 +13,9 @@ softdepend:
 
 commands:
   nophantoms:
-    description: Disables phantoms for the player
+    description: Main command for Personal Phantoms
     aliases:
-      - nophantom
       - phantoms
-      - phantom
     permission: pp.nophantoms
 
 permissions:

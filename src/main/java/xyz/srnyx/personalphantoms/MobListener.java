@@ -1,4 +1,4 @@
-package xyz.srnyx.personalphantoms.listeners;
+package xyz.srnyx.personalphantoms;
 
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -14,10 +14,8 @@ import org.jetbrains.annotations.NotNull;
 import xyz.srnyx.annoyingapi.AnnoyingListener;
 import xyz.srnyx.annoyingapi.data.EntityData;
 
-import xyz.srnyx.personalphantoms.PersonalPhantoms;
 
-
-public class MobListener implements AnnoyingListener {
+public class MobListener extends AnnoyingListener {
     @NotNull private final PersonalPhantoms plugin;
 
     public MobListener(@NotNull PersonalPhantoms plugin) {

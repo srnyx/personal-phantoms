@@ -1,4 +1,4 @@
-package xyz.srnyx.personalphantoms.commands;
+package xyz.srnyx.personalphantoms;
 
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -15,7 +15,7 @@ import xyz.srnyx.annoyingapi.message.AnnoyingMessage;
 import xyz.srnyx.annoyingapi.message.DefaultReplaceType;
 import xyz.srnyx.annoyingapi.utility.BukkitUtility;
 
-import xyz.srnyx.personalphantoms.PersonalPhantoms;
+import java.util.ArrayList;
 
 import java.util.Set;
 

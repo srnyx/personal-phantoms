@@ -28,9 +28,7 @@ public class PersonalPhantoms extends AnnoyingPlugin {
                         PluginPlatform.spigot("106381")))
                 .bStatsOptions(bStatsOptions -> bStatsOptions.id(18328))
                 .registrationOptions
-                .automaticRegistration(automaticRegistration -> automaticRegistration.packages(
-                        "xyz.srnyx.personalphantoms.commands",
-                        "xyz.srnyx.personalphantoms.listeners"))
+                .toRegister(this, NoPhantomsCmd.class, MobListener.class)
                 .papiExpansionToRegister(() -> new PersonalPlaceholders(this));
 
         reload();

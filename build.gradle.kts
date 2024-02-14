@@ -10,7 +10,7 @@ plugins {
     id("com.github.johnrengelman.shadow") version "8.1.1"
 }
 
-setupAnnoyingAPI("4.3.1", "xyz.srnyx", "2.0.0", "Plugin used for per-player phantom spawning/control")
+setupAnnoyingAPI("900f90e66d", "xyz.srnyx", "2.0.0", "Plugin used for per-player phantom spawning/control")
 spigotAPI("1.13")
 repository(Repository.PLACEHOLDER_API)
 dependencies.compileOnly("me.clip", "placeholderapi", "2.11.3")

@@ -7,8 +7,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityTargetEvent;
-
 import org.bukkit.event.player.PlayerJoinEvent;
+
 import org.jetbrains.annotations.NotNull;
 
 import xyz.srnyx.annoyingapi.AnnoyingListener;

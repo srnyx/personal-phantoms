@@ -56,7 +56,7 @@ public class NoPhantomsCmd extends AnnoyingCommand {
             if (sender.argEquals(0, "get")) {
                 if (!sender.checkPlayer()) return;
                 new AnnoyingMessage(plugin, "get.self")
-                        .replace("%status%", new EntityData(plugin, sender.getPlayer()).has(PersonalPhantoms.KEY), DefaultReplaceType.BOOLEAN)
+                        .replace("%status%", !new EntityData(plugin, sender.getPlayer()).has(PersonalPhantoms.KEY), DefaultReplaceType.BOOLEAN)
                         .send(sender);
                 return;
             }
@@ -64,9 +64,10 @@ public class NoPhantomsCmd extends AnnoyingCommand {
             // <toggle|enable|disable>
             if (sender.argEquals(0, "toggle", "enable", "disable")) {
                 if (!sender.checkPlayer() || !sender.checkPermission("pp.nophantoms")) return;
+                final Player player = sender.getPlayer();
 
                 // Check if on cooldown
-                final AnnoyingCooldown cooldown = new AnnoyingCooldown(plugin, sender.getPlayer().getUniqueId(), COOLDOWN_TYPE);
+                final AnnoyingCooldown cooldown = new AnnoyingCooldown(plugin, player.getUniqueId(), COOLDOWN_TYPE);
                 if (!cmdSender.hasPermission("pp.nophantoms.bypass") && cooldown.isOnCooldown()) {
                     new AnnoyingMessage(plugin, "nophantoms.cooldown")
                             .replace("%cooldown%", cooldown.getRemaining(), DefaultReplaceType.TIME)
@@ -76,7 +77,7 @@ public class NoPhantomsCmd extends AnnoyingCommand {
 
                 // Edit
                 new AnnoyingMessage(plugin, "nophantoms.self")
-                        .replace("%status%", editKey(sender.getPlayer(), sender.argEquals(0, "toggle") ? null : sender.argEquals(0, "enable")), DefaultReplaceType.BOOLEAN)
+                        .replace("%status%", editKey(player, sender.argEquals(0, "toggle") ? null : sender.argEquals(0, "enable")), DefaultReplaceType.BOOLEAN)
                         .send(sender);
                 return;
             }
@@ -104,7 +105,7 @@ public class NoPhantomsCmd extends AnnoyingCommand {
         if (sender.argEquals(0, "get")) {
             new AnnoyingMessage(plugin, "get.other")
                     .replace("%target%", targetName)
-                    .replace("%status%", new EntityData(plugin, target).has(PersonalPhantoms.KEY), DefaultReplaceType.BOOLEAN)
+                    .replace("%status%", !new EntityData(plugin, target).has(PersonalPhantoms.KEY), DefaultReplaceType.BOOLEAN)
                     .send(sender);
             return;
         }
@@ -150,14 +151,19 @@ public class NoPhantomsCmd extends AnnoyingCommand {
         return null;
     }
 
-    private boolean editKey(@NotNull Player player, @Nullable Boolean newStatus) {
+    /**
+     * Edit the key status for a player
+     *
+     * @param   player          the player to edit the key status for
+     *
+     * @param   enablePhantoms  whether to enable or disable phantoms for the player
+     *
+     * @return                  the new status of the key (true if phantoms enabled, false if disabled)
+     */
+    private boolean editKey(@NotNull Player player, @Nullable Boolean enablePhantoms) {
         final EntityData data = new EntityData(plugin, player);
-        if (newStatus == null) newStatus = !data.has(PersonalPhantoms.KEY); // toggle
-        if (!newStatus) {
-            data.remove(PersonalPhantoms.KEY);
-        } else {
-            data.set(PersonalPhantoms.KEY, true);
-        }
-        return newStatus;
+        if (enablePhantoms == null) enablePhantoms = data.has(PersonalPhantoms.KEY); // toggle
+        data.set(PersonalPhantoms.KEY, enablePhantoms ? null : true);
+        return enablePhantoms;
     }
 }

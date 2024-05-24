@@ -1,3 +1,7 @@
+# How often to reset players last rest time
+# You should only change this if you have a different daylight cycle speed than the default
+check-interval: 600 # seconds
+
 # A list of worlds where the plugin won't be enabled
 worlds-blacklist:
   list:

@@ -4,7 +4,6 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -25,23 +24,6 @@ public class MobListener extends AnnoyingListener {
     @Override @NotNull
     public PersonalPhantoms getAnnoyingPlugin() {
         return plugin;
-    }
-
-    /**
-     * Called when a creature is spawned into a world.
-     * If a Creature Spawn event is cancelled, the creature will not spawn.
-     */
-    @EventHandler
-    public void onCreatureSpawn(@NotNull CreatureSpawnEvent event) {
-        final Entity entity = event.getEntity();
-        // Check if Phantom
-        if (entity.getType() == EntityType.PHANTOM
-                // Check if natural spawn
-                && event.getSpawnReason() == CreatureSpawnEvent.SpawnReason.NATURAL
-                // Check if plugin enabled in world
-                && (plugin.worldsBlacklist == null || plugin.worldsBlacklist.contains(entity.getWorld().getName()) != plugin.treatBlacklistAsWhitelist)
-                // Check if any nearby players have phantoms disabled TODO: Find a better way to do this
-                && entity.getNearbyEntities(10, 35, 10).stream().anyMatch(nearby -> nearby instanceof Player && new EntityData(plugin, nearby).has(PersonalPhantoms.KEY))) event.setCancelled(true);
     }
 
     /**
@@ -68,14 +50,14 @@ public class MobListener extends AnnoyingListener {
 
     /**
      * Called when a player joins a server
-     *
-     * @deprecated  Used for old data conversion
      */
-    @EventHandler @Deprecated
+    @EventHandler
     public void onPlayerJoin(@NotNull PlayerJoinEvent event) {
         final Player player = event.getPlayer();
-        if (!player.getScoreboardTags().contains(PersonalPhantoms.KEY)) return;
-        new EntityData(plugin, player).set(PersonalPhantoms.KEY, true);
-        player.removeScoreboardTag(PersonalPhantoms.KEY);
+        final EntityData data = new EntityData(plugin, player);
+        //TODO Old data conversion
+        data.convertOldData(PersonalPhantoms.KEY);
+        // Reset statistic
+        if (plugin.shouldResetStatistic(player)) PersonalPhantoms.resetStatistic(player);
     }
 }

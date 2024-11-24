@@ -30,7 +30,7 @@ public class PersonalPlaceholders extends AnnoyingPAPIExpansion {
     @Override @Nullable
     public String onPlaceholderRequest(@Nullable Player player, @NotNull String identifier) {
         // status
-        if (player != null && identifier.equals("status")) return new EntityData(plugin, player).has(PersonalPhantoms.KEY) ? "true" : "false";
+        if (player != null && identifier.equals("status")) return String.valueOf(new EntityData(plugin, player).has(PersonalPhantoms.KEY));
 
         // status_<player>
         if (identifier.startsWith("status_")) {

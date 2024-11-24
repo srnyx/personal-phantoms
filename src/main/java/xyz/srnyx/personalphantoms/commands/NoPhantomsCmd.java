@@ -1,4 +1,4 @@
-package xyz.srnyx.personalphantoms;
+package xyz.srnyx.personalphantoms.commands;
 
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
@@ -10,12 +10,13 @@ import org.jetbrains.annotations.Nullable;
 import xyz.srnyx.annoyingapi.command.AnnoyingCommand;
 import xyz.srnyx.annoyingapi.command.AnnoyingSender;
 import xyz.srnyx.annoyingapi.cooldown.AnnoyingCooldown;
-import xyz.srnyx.annoyingapi.cooldown.CooldownType;
 import xyz.srnyx.annoyingapi.data.EntityData;
 import xyz.srnyx.annoyingapi.data.StringData;
 import xyz.srnyx.annoyingapi.message.AnnoyingMessage;
 import xyz.srnyx.annoyingapi.message.DefaultReplaceType;
 import xyz.srnyx.annoyingapi.utility.BukkitUtility;
+
+import xyz.srnyx.personalphantoms.PersonalPhantoms;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -23,8 +24,6 @@ import java.util.List;
 
 
 public class NoPhantomsCmd extends AnnoyingCommand {
-    @NotNull private static final CooldownType COOLDOWN_TYPE = () -> 30000;
-
     @NotNull private final PersonalPhantoms plugin;
 
     public NoPhantomsCmd(@NotNull PersonalPhantoms plugin) {
@@ -43,7 +42,7 @@ public class NoPhantomsCmd extends AnnoyingCommand {
 
     public void onCommand(@NotNull AnnoyingSender sender) {
         final CommandSender cmdSender = sender.cmdSender;
-        final String[] args = sender.args;
+        final int length = sender.args.length;
 
         // reload
         if (sender.argEquals(0, "reload")) {
@@ -53,7 +52,7 @@ public class NoPhantomsCmd extends AnnoyingCommand {
             return;
         }
 
-        if (args.length == 1) {
+        if (length == 1) {
             // get
             if (sender.argEquals(0, "get")) {
                 if (sender.checkPlayer()) new AnnoyingMessage(plugin, "get.self")
@@ -68,8 +67,8 @@ public class NoPhantomsCmd extends AnnoyingCommand {
                 final Player player = sender.getPlayer();
 
                 // Check if on cooldown
-                final AnnoyingCooldown cooldown = new AnnoyingCooldown(plugin, player.getUniqueId().toString(), COOLDOWN_TYPE);
-                if (!cmdSender.hasPermission("pp.nophantoms.bypass") && cooldown.isOnCooldownStart()) {
+                final AnnoyingCooldown cooldown = plugin.cooldownManager.getCooldownElseNew("NoPhantomsCmd", player.getUniqueId().toString());
+                if (!cmdSender.hasPermission("pp.nophantoms.bypass") && cooldown.isOnCooldownStart(plugin.config.commandCooldown)) {
                     new AnnoyingMessage(plugin, "nophantoms.cooldown")
                             .replace("%cooldown%", cooldown.getRemaining(), DefaultReplaceType.TIME)
                             .send(sender);
@@ -88,18 +87,15 @@ public class NoPhantomsCmd extends AnnoyingCommand {
         }
 
         // Check args and permission
-        if (args.length != 2) {
+        if (length != 2) {
             sender.invalidArguments();
             return;
         }
         if (!sender.checkPermission("pp.nophantoms.others")) return;
 
         // Get target
-        final OfflinePlayer target = BukkitUtility.getOfflinePlayer(args[1]);
-        if (target == null) {
-            sender.invalidArgument(args[1]);
-            return;
-        }
+        final OfflinePlayer target = sender.getArgumentOptionalFlat(1, BukkitUtility::getOfflinePlayer).orElse(null);
+        if (target == null) return;
         final String targetName = target.getName();
 
         // get [<player>]
@@ -169,7 +165,7 @@ public class NoPhantomsCmd extends AnnoyingCommand {
 
         // Reset statistic if needed
         final Player online = offline.getPlayer();
-        if (online != null && plugin.inWhitelistedWorld(online)) PersonalPhantoms.resetStatistic(online);
+        if (online != null && plugin.isWhitelistedWorld(online.getWorld())) PersonalPhantoms.resetStatistic(online);
 
         return enablePhantoms;
     }

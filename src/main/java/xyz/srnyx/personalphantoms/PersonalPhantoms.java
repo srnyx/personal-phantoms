@@ -2,43 +2,41 @@ package xyz.srnyx.personalphantoms;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Statistic;
-import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import xyz.srnyx.annoyingapi.AnnoyingPlugin;
 import xyz.srnyx.annoyingapi.PluginPlatform;
 import xyz.srnyx.annoyingapi.data.EntityData;
-import xyz.srnyx.annoyingapi.file.AnnoyingResource;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class PersonalPhantoms extends AnnoyingPlugin {
     @NotNull public static final String KEY = "pp_no-phantoms";
 
-    @Nullable public BukkitTask task;
-    @Nullable public Set<String> worldsBlacklist;
-    public boolean treatBlacklistAsWhitelist;
+    public ConfigYml config;
+    @NotNull private final Map<String, BukkitTask> tasks = new HashMap<>();
 
     public PersonalPhantoms() {
         options
                 .pluginOptions(pluginOptions -> pluginOptions.updatePlatforms(
-                        PluginPlatform.modrinth("personal-phantoms"),
-                        PluginPlatform.hangar(this, "srnyx"),
+                        PluginPlatform.modrinth("lzjYdd5h"),
+                        PluginPlatform.hangar(this),
                         PluginPlatform.spigot("106381")))
                 .bStatsOptions(bStatsOptions -> bStatsOptions.id(18328))
                 .dataOptions(dataOptions -> dataOptions
                         .enabled(true)
                         .entityDataColumns(KEY))
                 .registrationOptions
-                .toRegister(this, NoPhantomsCmd.class, MobListener.class)
+                .automaticRegistration(automaticRegistration -> automaticRegistration.packages(
+                        "xyz.srnyx.personalphantoms.commands",
+                        "xyz.srnyx.personalphantoms.listeners"))
                 .papiExpansionToRegister(() -> new PersonalPlaceholders(this));
     }
 
@@ -49,34 +47,48 @@ public class PersonalPhantoms extends AnnoyingPlugin {
 
     @Override
     public void reload() {
-        // Config
-        final AnnoyingResource config = new AnnoyingResource(this, "config.yml");
-        final ConfigurationSection worldsBlacklistedSection = config.getConfigurationSection("worlds-blacklist");
-        if (worldsBlacklistedSection != null) {
-            final List<String> list = worldsBlacklistedSection.getStringList("list");
-            treatBlacklistAsWhitelist = worldsBlacklistedSection.getBoolean("treat-as-whitelist");
-            worldsBlacklist = list.isEmpty() && !treatBlacklistAsWhitelist ? null : new HashSet<>(list);
-        } else {
-            worldsBlacklist = null;
+        config = new ConfigYml(this);
+
+        // Start tasks
+        final Long delay = config.statisticTask.delay;
+        final long period = config.statisticTask.period;
+        for (final World world : Bukkit.getWorlds()) {
+            final String name = world.getName();
+            if (!isWhitelistedWorld(world)) continue;
+
+            // Cancel previous task
+            final BukkitTask previousTask = tasks.get(name);
+            if (previousTask != null) previousTask.cancel();
+
+            // Get time & isNight
+            // Daytime: 0-12000
+            // Nighttime: 12000-24000
+            final long time = world.getTime();
+            final boolean isNight = time >= 12000;
+
+            // Run immediately if nighttime
+            if (isNight) resetAllStatistics(world);
+
+            // Get delay
+            Long worldDelay = delay; // Configured specific delay
+            if (worldDelay == null) worldDelay = isNight ? 36000 - time : 12000 - time; // Automatic calculation
+
+            // Start periodic task
+            tasks.put(name, new BukkitRunnable() {
+                @Override
+                public void run() {
+                    resetAllStatistics(world);
+                }
+            }.runTaskTimer(this, worldDelay, period));
         }
-
-        // Runnable task
-        final long checkInterval = config.getInt("check-interval", 600) * 20L;
-        if (task != null) task.cancel();
-        task = new BukkitRunnable() {
-            @Override
-            public void run() {
-                for (final Player player : Bukkit.getOnlinePlayers()) if (shouldResetStatistic(player)) resetStatistic(player);
-            }
-        }.runTaskTimer(this, checkInterval, checkInterval);
     }
 
-    public boolean inWhitelistedWorld(@NotNull Player player) {
-        return worldsBlacklist == null || (worldsBlacklist.contains(player.getWorld().getName()) != treatBlacklistAsWhitelist);
+    private void resetAllStatistics(@NotNull World world) {
+        for (final Player player : world.getPlayers()) if (new EntityData(this, player).has(KEY)) resetStatistic(player);
     }
 
-    public boolean shouldResetStatistic(@NotNull Player player) {
-        return inWhitelistedWorld(player) && new EntityData(this, player).has(KEY);
+    public boolean isWhitelistedWorld(@NotNull World world) {
+        return config.worldsBlacklist.list == null || config.worldsBlacklist.list.contains(world.getName()) == config.worldsBlacklist.treatAsWhitelist;
     }
 
     public static void resetStatistic(@NotNull Player player) {

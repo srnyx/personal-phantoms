@@ -1,12 +1,20 @@
-# How often to reset players last rest time
-# You should only change this if you have a different daylight cycle speed than the default
-check-interval: 600 # seconds
+# How long until a player can toggle phantoms again
+command-cooldown: 600 # seconds
+
+# The plugin works by resetting player sleep statistics so that phantoms never spawn
+# These options relate to how often the plugin should reset player sleep statistics (in ticks, 20 ticks = 1 second)
+statistic-task:
+  # The delay before the first run of the task (since plugin load)
+  # automatic = the plugin will automatically calculate the best delay based on the current time of day in-game (per world)
+  delay: automatic # ticks
+  # The period between each run of the task
+  period: 24000 # ticks
 
 # A list of worlds where the plugin won't be enabled
 worlds-blacklist:
   list:
-    - "disable_plugin1"
-    - "disable_plugin2"
+    - "world_nether"
+    - "world_the_end"
 
   # If true, the list of worlds above will act as a whitelist, meaning only those worlds will have the plugin enabled
-  act-as-whitelist: false
+  treat-as-whitelist: false

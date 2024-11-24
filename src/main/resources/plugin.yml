@@ -4,7 +4,7 @@ authors:
   - srnyx
 website: https://srnyx.com
 
-main: ${group}.personalphantoms.PersonalPhantoms
+main: ${mainPackage}.${name}
 version: ${version}
 api-version: 1.13
 folia-supported: true

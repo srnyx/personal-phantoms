@@ -6,8 +6,8 @@ import xyz.srnyx.gradlegalaxy.utility.spigotAPI
 
 plugins {
     java
-    id("xyz.srnyx.gradle-galaxy") version "1.3.2"
-    id("com.gradleup.shadow") version "8.3.5"
+    id("xyz.srnyx.gradle-galaxy") version "1.3.3"
+    id("com.gradleup.shadow") version "8.3.6"
 }
 
 setupAnnoyingAPI("5.1.5", "xyz.srnyx", "2.1.0", "Plugin used for per-player phantom spawning/control")

@@ -4,13 +4,12 @@ import org.bukkit.Bukkit;
 import org.bukkit.Statistic;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scheduler.BukkitTask;
 
 import org.jetbrains.annotations.NotNull;
 
 import xyz.srnyx.annoyingapi.AnnoyingPlugin;
 import xyz.srnyx.annoyingapi.PluginPlatform;
+import xyz.srnyx.annoyingapi.TaskWrapper;
 import xyz.srnyx.annoyingapi.data.EntityData;
 
 import java.util.HashMap;
@@ -21,7 +20,7 @@ public class PersonalPhantoms extends AnnoyingPlugin {
     @NotNull public static final String KEY = "pp_no-phantoms";
 
     public ConfigYml config;
-    @NotNull private final Map<String, BukkitTask> tasks = new HashMap<>();
+    @NotNull private final Map<String, TaskWrapper> tasks = new HashMap<>();
 
     public PersonalPhantoms() {
         options
@@ -57,7 +56,7 @@ public class PersonalPhantoms extends AnnoyingPlugin {
             if (!isWhitelistedWorld(world)) continue;
 
             // Cancel previous task
-            final BukkitTask previousTask = tasks.get(name);
+            final TaskWrapper previousTask = tasks.get(name);
             if (previousTask != null) previousTask.cancel();
 
             // Get time & isNight
@@ -74,12 +73,7 @@ public class PersonalPhantoms extends AnnoyingPlugin {
             if (worldDelay == null) worldDelay = isNight ? 36000 - time : 12000 - time; // Automatic calculation
 
             // Start periodic task
-            tasks.put(name, new BukkitRunnable() {
-                @Override
-                public void run() {
-                    resetAllStatistics(world);
-                }
-            }.runTaskTimer(this, worldDelay, period));
+            tasks.put(name, runGlobalTaskTimer(() -> resetAllStatistics(world), worldDelay, period));
         }
     }
 

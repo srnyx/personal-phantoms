@@ -10,7 +10,7 @@ plugins {
     id("com.gradleup.shadow") version "8.3.6"
 }
 
-setupAnnoyingAPI("0d3c33c14c", "xyz.srnyx", "2.1.2", "Plugin used for per-player phantom spawning/control")
+setupAnnoyingAPI("0d3c33c14c", "xyz.srnyx", "2.1.1", "Plugin used for per-player phantom spawning/control")
 spigotAPI("1.13")
 
 repository(Repository.PLACEHOLDER_API)

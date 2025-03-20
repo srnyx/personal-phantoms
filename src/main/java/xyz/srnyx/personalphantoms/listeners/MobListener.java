@@ -2,10 +2,11 @@ package xyz.srnyx.personalphantoms.listeners;
 
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityTargetEvent;
+import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 
 import org.jetbrains.annotations.NotNull;
@@ -28,13 +29,10 @@ public class MobListener extends AnnoyingListener {
         return plugin;
     }
 
-    /**
-     * Called when a creature targets or untargets another entity
-     */
     @EventHandler
-    public void onEntityTarget(@NotNull EntityTargetEvent event) {
+    public void onEntityTargetLivingEntity(@NotNull EntityTargetLivingEntityEvent event) {
         if (event.getEntity().getType() != EntityType.PHANTOM) return;
-        final Entity target = event.getTarget();
+        final LivingEntity target = event.getTarget();
         if (target instanceof Player && plugin.isWhitelistedWorld(target.getWorld()) && new EntityData(plugin, target).has(PersonalPhantoms.KEY)) event.setCancelled(true);
     }
 

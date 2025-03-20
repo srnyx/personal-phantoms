@@ -1,6 +1,7 @@
 package xyz.srnyx.personalphantoms.commands;
 
 import org.bukkit.OfflinePlayer;
+import org.bukkit.Statistic;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -163,9 +164,17 @@ public class NoPhantomsCmd extends AnnoyingCommand {
         if (enablePhantoms == null) enablePhantoms = data.has(PersonalPhantoms.KEY); // toggle
         data.set(PersonalPhantoms.KEY, enablePhantoms ? null : true);
 
-        // Reset statistic if needed
+        // Update statistic
         final Player online = offline.getPlayer();
-        if (online != null && plugin.isWhitelistedWorld(online.getWorld())) PersonalPhantoms.resetStatistic(online);
+        if (online != null && plugin.isWhitelistedWorld(online.getWorld())) {
+            if (enablePhantoms) {
+                // Set statistic to 1 hour (so phantoms will attack)
+                online.setStatistic(Statistic.TIME_SINCE_REST, 72000);
+            } else {
+                // Reset statistic (so phantoms won't attack)
+                PersonalPhantoms.resetStatistic(online);
+            }
+        }
 
         return enablePhantoms;
     }

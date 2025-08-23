@@ -20,6 +20,8 @@ commands:
     permission: pp.nophantoms
 
 permissions:
+  pp.reload:
+    description: Allows the player to use /nophantoms reload
   pp.nophantoms:
     description: Allows the player to use /nophantoms
     default: true

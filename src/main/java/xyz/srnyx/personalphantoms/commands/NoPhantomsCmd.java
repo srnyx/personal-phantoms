@@ -74,7 +74,7 @@ public class NoPhantomsCmd extends AnnoyingCommand {
                 if (!cmdSender.hasPermission("pp.nophantoms.bypass")) {
                     final AnnoyingCooldown cooldown = plugin.cooldownManager.getCooldownElseNew("NoPhantomsCmd", player.getUniqueId().toString());
                     final long duration = BukkitUtility.getPermissionValue(player, "pp.nophantoms.cooldown.")
-                            .map(value -> value * 1000L) // Convert to milliseconds
+                            .map(value -> value * 1000) // Convert to milliseconds
                             .orElse(plugin.config.commandCooldown);
                     if (cooldown.isOnCooldownStart(duration)) {
                         new AnnoyingMessage(plugin, "nophantoms.cooldown")

@@ -1,3 +1,6 @@
+# The default toggle state for phantoms (true = phantoms enabled, false = phantoms disabled)
+default: true
+
 # How long until a player can toggle phantoms again
 command-cooldown: 600 # seconds
 
@@ -8,6 +11,7 @@ statistic-task:
   # automatic = the plugin will automatically calculate the best delay based on the current time of day in-game (per world)
   delay: automatic # ticks
   # The period between each run of the task
+  # Default: 2400 ticks = 20 minutes = 1 full Minecraft day
   period: 24000 # ticks
 
 # A list of worlds where the plugin won't be enabled

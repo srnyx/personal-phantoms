@@ -11,7 +11,6 @@ import org.jetbrains.annotations.Nullable;
 import xyz.srnyx.annoyingapi.command.AnnoyingCommand;
 import xyz.srnyx.annoyingapi.command.AnnoyingSender;
 import xyz.srnyx.annoyingapi.cooldown.AnnoyingCooldown;
-import xyz.srnyx.annoyingapi.data.EntityData;
 import xyz.srnyx.annoyingapi.data.StringData;
 import xyz.srnyx.annoyingapi.message.AnnoyingMessage;
 import xyz.srnyx.annoyingapi.message.DefaultReplaceType;
@@ -61,14 +60,14 @@ public class NoPhantomsCmd extends AnnoyingCommand {
             // get
             if (sender.argEquals(0, "get")) {
                 if (sender.checkPlayer()) new AnnoyingMessage(plugin, "get.self")
-                        .replace("%status%", !new EntityData(plugin, sender.getPlayer()).has(PersonalPhantoms.KEY), DefaultReplaceType.BOOLEAN)
+                        .replace("%status%", !plugin.hasPhantomsEnabled(sender.getPlayer()), DefaultReplaceType.BOOLEAN)
                         .send(sender);
                 return;
             }
 
             // <toggle|enable|disable>
             if (sender.argEquals(0, "toggle", "enable", "disable")) {
-                if (!sender.checkPlayer() || !sender.checkPermission("pp.nophantoms")) return;
+                if (!sender.checkPlayer()) return;
                 final Player player = sender.getPlayer();
 
                 // Check if on cooldown
@@ -108,7 +107,7 @@ public class NoPhantomsCmd extends AnnoyingCommand {
         if (sender.argEquals(0, "get")) {
             new AnnoyingMessage(plugin, "get.other")
                     .replace("%target%", targetName)
-                    .replace("%status%", !new StringData(plugin, target).has(PersonalPhantoms.KEY), DefaultReplaceType.BOOLEAN)
+                    .replace("%status%", !plugin.hasPhantomsEnabled(target), DefaultReplaceType.BOOLEAN)
                     .send(sender);
             return;
         }
@@ -166,8 +165,8 @@ public class NoPhantomsCmd extends AnnoyingCommand {
     private boolean editKey(@NotNull OfflinePlayer offline, @Nullable Boolean enablePhantoms) {
         // Update key status
         final StringData data = new StringData(plugin, offline);
-        if (enablePhantoms == null) enablePhantoms = data.has(PersonalPhantoms.KEY); // toggle
-        data.set(PersonalPhantoms.KEY, enablePhantoms ? null : true);
+        if (enablePhantoms == null) enablePhantoms = !plugin.hasPhantomsEnabled(data); // toggle
+        data.set(PersonalPhantoms.KEY, !enablePhantoms);
 
         // Update statistic
         final Player online = offline.getPlayer();

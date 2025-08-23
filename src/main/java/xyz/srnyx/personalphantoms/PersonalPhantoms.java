@@ -1,6 +1,7 @@
 package xyz.srnyx.personalphantoms;
 
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.Statistic;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -10,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
 import xyz.srnyx.annoyingapi.AnnoyingPlugin;
 import xyz.srnyx.annoyingapi.PluginPlatform;
 import xyz.srnyx.annoyingapi.TaskWrapper;
-import xyz.srnyx.annoyingapi.data.EntityData;
+import xyz.srnyx.annoyingapi.data.StringData;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -77,8 +78,18 @@ public class PersonalPhantoms extends AnnoyingPlugin {
         }
     }
 
+    public boolean hasPhantomsEnabled(@NotNull StringData data) {
+        return data.getOptional(KEY)
+                .map(value -> value.equals("true"))
+                .orElse(!config.def);
+    }
+
+    public boolean hasPhantomsEnabled(@NotNull OfflinePlayer player) {
+        return hasPhantomsEnabled(new StringData(this, player));
+    }
+
     private void resetAllStatistics(@NotNull World world) {
-        for (final Player player : world.getPlayers()) if (new EntityData(this, player).has(KEY)) resetStatistic(player);
+        for (final Player player : world.getPlayers()) if (!hasPhantomsEnabled(player)) resetStatistic(player);
     }
 
     public boolean isWhitelistedWorld(@NotNull World world) {

@@ -12,7 +12,6 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.jetbrains.annotations.NotNull;
 
 import xyz.srnyx.annoyingapi.AnnoyingListener;
-import xyz.srnyx.annoyingapi.data.EntityData;
 
 import xyz.srnyx.personalphantoms.PersonalPhantoms;
 
@@ -33,7 +32,7 @@ public class MobListener extends AnnoyingListener {
     public void onEntityTargetLivingEntity(@NotNull EntityTargetLivingEntityEvent event) {
         if (event.getEntity().getType() != EntityType.PHANTOM) return;
         final LivingEntity target = event.getTarget();
-        if (target instanceof Player && plugin.isWhitelistedWorld(target.getWorld()) && new EntityData(plugin, target).has(PersonalPhantoms.KEY)) event.setCancelled(true);
+        if (target instanceof Player && plugin.isWhitelistedWorld(target.getWorld()) && !plugin.hasPhantomsEnabled((Player) target)) event.setCancelled(true);
     }
 
     /**
@@ -45,12 +44,12 @@ public class MobListener extends AnnoyingListener {
         if (!plugin.isWhitelistedWorld(damager.getWorld())) return;
         final Entity target = event.getEntity();
         // Player attacking Phantom
-        if (damager instanceof Player && target.getType() == EntityType.PHANTOM && new EntityData(plugin, damager).has(PersonalPhantoms.KEY)) {
+        if (damager instanceof Player && target.getType() == EntityType.PHANTOM && !plugin.hasPhantomsEnabled((Player) damager)) {
             event.setCancelled(true);
             return;
         }
         // Phantom attacking Player
-        if (damager.getType() == EntityType.PHANTOM && target instanceof Player && new EntityData(plugin, target).has(PersonalPhantoms.KEY)) event.setCancelled(true);
+        if (damager.getType() == EntityType.PHANTOM && target instanceof Player && !plugin.hasPhantomsEnabled((Player) target)) event.setCancelled(true);
     }
 
     /**
@@ -58,10 +57,8 @@ public class MobListener extends AnnoyingListener {
      */
     @EventHandler
     public void onPlayerJoin(@NotNull PlayerJoinEvent event) {
-        final Player player = event.getPlayer();
-        final EntityData data = new EntityData(plugin, player);
-        data.convertOldData(PersonalPhantoms.KEY); //TODO remove in future
         // Reset statistic
-        if (plugin.isWhitelistedWorld(player.getWorld()) && new EntityData(plugin, player).has(PersonalPhantoms.KEY)) PersonalPhantoms.resetStatistic(player);
+        final Player player = event.getPlayer();
+        if (plugin.isWhitelistedWorld(player.getWorld()) && !plugin.hasPhantomsEnabled(player)) PersonalPhantoms.resetStatistic(player);
     }
 }

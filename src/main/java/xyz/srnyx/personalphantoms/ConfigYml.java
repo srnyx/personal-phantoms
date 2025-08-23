@@ -14,12 +14,18 @@ import java.util.Set;
 public class ConfigYml {
     @NotNull private final AnnoyingResource config;
 
+    /**
+     * {@code default}
+     */
+    public final boolean def;
     public final long commandCooldown;
     @NotNull public StatisticTask statisticTask;
     @NotNull public WorldsBlacklist worldsBlacklist;
 
     public ConfigYml(@NotNull AnnoyingPlugin plugin) {
         config = new AnnoyingResource(plugin, "config.yml");
+
+        def = config.getBoolean("default", true);
         commandCooldown = config.getLong("command-cooldown", 600) * 1000; // default: 10 minutes
         statisticTask = new StatisticTask();
         worldsBlacklist = new WorldsBlacklist();

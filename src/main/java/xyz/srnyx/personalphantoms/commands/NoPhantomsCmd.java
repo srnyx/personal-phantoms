@@ -53,6 +53,10 @@ public class NoPhantomsCmd extends AnnoyingCommand {
             return;
         }
 
+        // This command handles both "/nophantoms" AND "/phantoms" (for convenience)
+        // But, commands such as "/phantoms disable" and "/nophantoms disable" mean different things to the player
+        final boolean inverse = sender.label != null && sender.label.equalsIgnoreCase("nophantoms");
+
         if (length == 1) {
             // get
             if (sender.argEquals(0, "get")) {
@@ -77,8 +81,9 @@ public class NoPhantomsCmd extends AnnoyingCommand {
                 }
 
                 // Edit
+                final boolean newStatus = editKey(player, sender.argEquals(0, "toggle") ? null : sender.argEquals(0, "enable") ^ inverse);
                 new AnnoyingMessage(plugin, "nophantoms.self")
-                        .replace("%status%", editKey(player, sender.argEquals(0, "toggle") ? null : sender.argEquals(0, "enable")), DefaultReplaceType.BOOLEAN)
+                        .replace("%status%", newStatus, DefaultReplaceType.BOOLEAN)
                         .send(sender);
                 return;
             }
@@ -110,7 +115,7 @@ public class NoPhantomsCmd extends AnnoyingCommand {
 
         // <toggle|enable|disable> [<player>]
         if (sender.argEquals(0, "toggle", "enable", "disable")) {
-            final boolean newStatus = editKey(target, sender.argEquals(0, "toggle") ? null : sender.argEquals(0, "enable"));
+            final boolean newStatus = editKey(target, sender.argEquals(0, "toggle") ? null : sender.argEquals(0, "enable") ^ inverse);
             new AnnoyingMessage(plugin, "nophantoms.toggler")
                     .replace("%target%", targetName)
                     .replace("%status%", newStatus, DefaultReplaceType.BOOLEAN)

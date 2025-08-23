@@ -29,3 +29,6 @@ permissions:
     description: Allows the player to toggle phantoms for other players
   pp.nophantoms.bypass:
     description: Allows the player to bypass the /nophantoms command cooldown
+  pp.nophantoms.cooldown.#:
+    description: "Set a custom cooldown for the /nophantoms command, replace # with the cooldown time (in seconds)"
+    default: false

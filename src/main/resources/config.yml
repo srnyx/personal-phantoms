@@ -2,6 +2,8 @@
 default: true
 
 # How long until a player can toggle phantoms again
+# You can give permission holders the 'pp.nophantoms.bypass' permission to ignore this cooldown
+# Or, you can give the 'pp.nophantoms.cooldown.#' permission to set a custom cooldown (replace # with the cooldown time in seconds)
 command-cooldown: 600 # seconds
 
 # The plugin works by resetting player sleep statistics so that phantoms never spawn

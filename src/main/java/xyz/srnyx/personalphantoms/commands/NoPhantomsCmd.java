@@ -10,6 +10,7 @@ import org.jetbrains.annotations.Nullable;
 
 import xyz.srnyx.annoyingapi.command.AnnoyingCommand;
 import xyz.srnyx.annoyingapi.command.AnnoyingSender;
+import xyz.srnyx.annoyingapi.command.selector.Selector;
 import xyz.srnyx.annoyingapi.cooldown.AnnoyingCooldown;
 import xyz.srnyx.annoyingapi.data.StringData;
 import xyz.srnyx.annoyingapi.message.AnnoyingMessage;
@@ -103,15 +104,15 @@ public class NoPhantomsCmd extends AnnoyingCommand {
         }
         if (!sender.checkPermission("pp.nophantoms.others")) return;
 
-        // Get target
-        final OfflinePlayer target = sender.getArgumentOptionalFlat(1, BukkitUtility::getOfflinePlayer).orElse(null);
-        if (target == null) return;
-        final String targetName = target.getName();
+        // Get targets
+        final List<OfflinePlayer> targets = sender.getSelector(1, OfflinePlayer.class)
+                .orElseFlatSingle(BukkitUtility::getOfflinePlayer);
+        if (targets == null) return;
 
         // get [<player>]
         if (sender.argEquals(0, "get")) {
-            new AnnoyingMessage(plugin, "get.other")
-                    .replace("%target%", targetName)
+            for (final OfflinePlayer target : targets) new AnnoyingMessage(plugin, "get.other")
+                    .replace("%target%", target.getName())
                     .replace("%status%", !plugin.hasPhantomsEnabled(target), DefaultReplaceType.BOOLEAN)
                     .send(sender);
             return;
@@ -119,16 +120,18 @@ public class NoPhantomsCmd extends AnnoyingCommand {
 
         // <toggle|enable|disable> [<player>]
         if (sender.argEquals(0, "toggle", "enable", "disable")) {
-            final boolean newStatus = editKey(target, sender.argEquals(0, "toggle") ? null : sender.argEquals(0, "enable") ^ inverse);
-            new AnnoyingMessage(plugin, "nophantoms.toggler")
-                    .replace("%target%", targetName)
-                    .replace("%status%", newStatus, DefaultReplaceType.BOOLEAN)
-                    .send(sender);
-            final Player targetOnline = target.getPlayer();
-            if (targetOnline != null) new AnnoyingMessage(plugin, "nophantoms.other")
-                    .replace("%status%", newStatus, DefaultReplaceType.BOOLEAN)
-                    .replace("%toggler%", cmdSender.getName())
-                    .send(targetOnline);
+            for (final OfflinePlayer target : targets) {
+                final boolean newStatus = editKey(target, sender.argEquals(0, "toggle") ? null : sender.argEquals(0, "enable") ^ inverse);
+                new AnnoyingMessage(plugin, "nophantoms.toggler")
+                        .replace("%target%", target.getName())
+                        .replace("%status%", newStatus, DefaultReplaceType.BOOLEAN)
+                        .send(sender);
+                final Player targetOnline = target.getPlayer();
+                if (targetOnline != null) new AnnoyingMessage(plugin, "nophantoms.other")
+                        .replace("%status%", newStatus, DefaultReplaceType.BOOLEAN)
+                        .replace("%toggler%", cmdSender.getName())
+                        .send(targetOnline);
+            }
             return;
         }
 
@@ -153,7 +156,7 @@ public class NoPhantomsCmd extends AnnoyingCommand {
         }
 
         // <get|toggle|enable|disable> [<player>]
-        if (!sender.argEquals(0, "reload") && cmdSender.hasPermission("pp.nophantoms.others")) return BukkitUtility.getOnlinePlayerNames();
+        if (!sender.argEquals(0, "reload") && cmdSender.hasPermission("pp.nophantoms.others")) return Selector.addKeys(BukkitUtility.getOnlinePlayerNames(), OfflinePlayer.class);
 
         return null;
     }

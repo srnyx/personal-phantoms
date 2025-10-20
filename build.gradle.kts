@@ -16,7 +16,7 @@ spigotAPI(config = DependencyConfig(version = "1.13"))
 setupAnnoyingAPI(
     javaSetupConfig = JavaSetupConfig(
         group = "xyz.srnyx",
-        version = "2.1.2",
+        version = "2.2.0",
         description = "Plugin used for per-player phantom spawning/control"),
     annoyingAPIConfig = DependencyConfig(version = "f1811a9961"))
 

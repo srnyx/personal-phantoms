@@ -12,6 +12,11 @@ jobs:
       versions: ">=1.13"
       modrinth: lzjYdd5h
       curseforge: 719645
+      loaders: |
+        purpur
+        paper
+        spigot
+        folia
     secrets: inherit
     permissions:
       contents: write

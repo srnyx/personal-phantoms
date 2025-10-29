@@ -173,7 +173,7 @@ public class NoPhantomsCmd extends AnnoyingCommand {
     private boolean editKey(@NotNull OfflinePlayer offline, @Nullable Boolean enablePhantoms) {
         // Update key status
         final StringData data = new StringData(plugin, offline);
-        if (enablePhantoms == null) enablePhantoms = !plugin.hasPhantomsEnabled(data); // toggle
+        if (enablePhantoms == null) enablePhantoms = plugin.hasPhantomsEnabled(data); // toggle
         data.set(PersonalPhantoms.KEY, !enablePhantoms);
 
         // Update statistic

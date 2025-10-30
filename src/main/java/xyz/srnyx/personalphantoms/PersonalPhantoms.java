@@ -10,8 +10,8 @@ import org.jetbrains.annotations.NotNull;
 
 import xyz.srnyx.annoyingapi.AnnoyingPlugin;
 import xyz.srnyx.annoyingapi.PluginPlatform;
-import xyz.srnyx.annoyingapi.TaskWrapper;
 import xyz.srnyx.annoyingapi.data.StringData;
+import xyz.srnyx.annoyingapi.scheduler.TaskWrapper;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -74,7 +74,7 @@ public class PersonalPhantoms extends AnnoyingPlugin {
             if (worldDelay == null) worldDelay = isNight ? 36000 - time : 12000 - time; // Automatic calculation
 
             // Start periodic task
-            tasks.put(name, runGlobalTaskTimer(() -> resetAllStatistics(world), worldDelay, period));
+            tasks.put(name, scheduler.runGlobalTaskTimer(() -> resetAllStatistics(world), worldDelay, period));
         }
     }
 

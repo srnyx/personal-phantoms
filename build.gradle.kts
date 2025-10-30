@@ -18,7 +18,7 @@ setupAnnoyingAPI(
         group = "xyz.srnyx",
         version = "2.2.0",
         description = "Plugin used for per-player phantom spawning/control"),
-    annoyingAPIConfig = DependencyConfig(version = "f1811a9961"))
+    annoyingAPIConfig = DependencyConfig(version = "59aeeb28a9"))
 
 repository(Repository.PLACEHOLDER_API)
 dependencies.compileOnly("me.clip", "placeholderapi", "2.11.6")

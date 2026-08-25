@@ -4,19 +4,13 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.Statistic;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import xyz.srnyx.annoyingapi.command.AnnoyingCommand;
 import xyz.srnyx.annoyingapi.command.AnnoyingSender;
-import xyz.srnyx.annoyingapi.command.selector.Selector;
 import xyz.srnyx.annoyingapi.cooldown.AnnoyingCooldown;
 import xyz.srnyx.annoyingapi.data.StringData;
-import xyz.srnyx.annoyingapi.message.AnnoyingMessage;
 import xyz.srnyx.annoyingapi.message.DefaultReplaceType;
 import xyz.srnyx.annoyingapi.utility.BukkitUtility;
-
 import xyz.srnyx.personalphantoms.PersonalPhantoms;
 
 import java.util.ArrayList;
@@ -24,32 +18,19 @@ import java.util.Collection;
 import java.util.List;
 
 
-public class NoPhantomsCmd extends AnnoyingCommand {
-    @NotNull private final PersonalPhantoms plugin;
+public class NoPhantomsCmd extends xyz.srnyx.personalphantoms.commands.generated.NophantomsCmdGen {
+    @NotNull private static final String COOLDOWN_KEY = "NoPhantomsCmd";
 
     public NoPhantomsCmd(@NotNull PersonalPhantoms plugin) {
-        this.plugin = plugin;
-    }
-
-    @Override @NotNull
-    public PersonalPhantoms getAnnoyingPlugin() {
-        return plugin;
-    }
-
-    @Override
-    public String getPermission() {
-        return "pp.nophantoms";
+        super(plugin);
     }
 
     public void onCommand(@NotNull AnnoyingSender sender) {
-        final CommandSender cmdSender = sender.cmdSender;
-        final int length = sender.args.length;
-
         // reload
         if (sender.argEquals(0, "reload")) {
             if (!sender.checkPermission("pp.reload")) return;
             plugin.reloadPlugin();
-            new AnnoyingMessage(plugin, "reload").send(sender);
+            plugin.getMessages().get().reload.newMessage().send(sender);
             return;
         }
 
@@ -57,10 +38,16 @@ public class NoPhantomsCmd extends AnnoyingCommand {
         // But, commands such as "/phantoms disable" and "/nophantoms disable" mean different things to the player
         final boolean inverse = sender.label != null && sender.label.equalsIgnoreCase("nophantoms");
 
-        if (length == 1) {
+        // No args: toggle
+        if (sender.args.length == 0) {
+            cooldownEditSelf(sender, null);
+            return;
+        }
+
+        if (sender.args.length == 1) {
             // get
             if (sender.argEquals(0, "get")) {
-                if (sender.checkPlayer()) new AnnoyingMessage(plugin, "get.self")
+                if (sender.checkPlayer()) plugin.getMessages().get().get.self.newMessage()
                         .replace("%status%", !plugin.hasPhantomsEnabled(sender.getPlayer()), DefaultReplaceType.BOOLEAN)
                         .send(sender);
                 return;
@@ -68,28 +55,7 @@ public class NoPhantomsCmd extends AnnoyingCommand {
 
             // <toggle|enable|disable>
             if (sender.argEquals(0, "toggle", "enable", "disable")) {
-                if (!sender.checkPlayer()) return;
-                final Player player = sender.getPlayer();
-
-                // Check if on cooldown
-                if (!cmdSender.hasPermission("pp.nophantoms.bypass")) {
-                    final AnnoyingCooldown cooldown = plugin.cooldownManager.getCooldownElseNew("NoPhantomsCmd", player.getUniqueId().toString());
-                    final long duration = BukkitUtility.getPermissionValue(player, "pp.nophantoms.cooldown.")
-                            .map(value -> value * 1000) // Convert to milliseconds
-                            .orElse(plugin.config.commandCooldown);
-                    if (cooldown.isOnCooldownStart(duration)) {
-                        new AnnoyingMessage(plugin, "nophantoms.cooldown")
-                                .replace("%cooldown%", cooldown.getRemaining(), DefaultReplaceType.TIME)
-                                .send(sender);
-                        return;
-                    }
-                }
-
-                // Edit
-                final boolean newStatus = editKey(player, sender.argEquals(0, "toggle") ? null : sender.argEquals(0, "enable") ^ inverse);
-                new AnnoyingMessage(plugin, "nophantoms.self")
-                        .replace("%status%", newStatus, DefaultReplaceType.BOOLEAN)
-                        .send(sender);
+                cooldownEditSelf(sender, sender.argEquals(0, "toggle") ? null : sender.argEquals(0, "enable") ^ inverse);
                 return;
             }
 
@@ -98,20 +64,21 @@ public class NoPhantomsCmd extends AnnoyingCommand {
         }
 
         // Check args and permission
-        if (length != 2) {
+        if (sender.args.length != 2) {
             sender.invalidArguments();
             return;
         }
         if (!sender.checkPermission("pp.nophantoms.others")) return;
 
         // Get targets
-        final List<OfflinePlayer> targets = sender.getSelector(1, OfflinePlayer.class)
+        final List<OfflinePlayer> targets = sender
+                .getSelector(1, OfflinePlayer.class)
                 .orElseFlatSingle(BukkitUtility::getOfflinePlayer);
         if (targets == null) return;
 
         // get [<player>]
         if (sender.argEquals(0, "get")) {
-            for (final OfflinePlayer target : targets) new AnnoyingMessage(plugin, "get.other")
+            for (final OfflinePlayer target : targets) plugin.getMessages().get().get.other.newMessage()
                     .replace("%target%", target.getName())
                     .replace("%status%", !plugin.hasPhantomsEnabled(target), DefaultReplaceType.BOOLEAN)
                     .send(sender);
@@ -122,14 +89,14 @@ public class NoPhantomsCmd extends AnnoyingCommand {
         if (sender.argEquals(0, "toggle", "enable", "disable")) {
             for (final OfflinePlayer target : targets) {
                 final boolean newStatus = editKey(target, sender.argEquals(0, "toggle") ? null : sender.argEquals(0, "enable") ^ inverse);
-                new AnnoyingMessage(plugin, "nophantoms.toggler")
+                plugin.getMessages().get().nophantoms.toggler.newMessage()
                         .replace("%target%", target.getName())
                         .replace("%status%", newStatus, DefaultReplaceType.BOOLEAN)
                         .send(sender);
                 final Player targetOnline = target.getPlayer();
-                if (targetOnline != null) new AnnoyingMessage(plugin, "nophantoms.other")
+                if (targetOnline != null) plugin.getMessages().get().nophantoms.other.newMessage()
                         .replace("%status%", newStatus, DefaultReplaceType.BOOLEAN)
-                        .replace("%toggler%", cmdSender.getName())
+                        .replace("%toggler%", sender.cmdSender.getName())
                         .send(targetOnline);
             }
             return;
@@ -156,9 +123,30 @@ public class NoPhantomsCmd extends AnnoyingCommand {
         }
 
         // <get|toggle|enable|disable> [<player>]
-        if (!sender.argEquals(0, "reload") && cmdSender.hasPermission("pp.nophantoms.others")) return Selector.addKeys(BukkitUtility.getOnlinePlayerNames(), OfflinePlayer.class);
+        if (!sender.argEquals(0, "reload") && cmdSender.hasPermission("pp.nophantoms.others")) return sender.withSelectorKeys(BukkitUtility.getOnlinePlayerNames(), OfflinePlayer.class);
 
         return null;
+    }
+
+    private void cooldownEditSelf(@NotNull AnnoyingSender sender, @Nullable Boolean enablePhantoms) {
+        // Get player
+        if (!sender.checkPlayer()) return;
+        final Player player = sender.getPlayer();
+
+        // Check if on cooldown
+        if (!player.hasPermission("pp.nophantoms.bypass")) {
+            final AnnoyingCooldown cooldown = plugin.cooldownManager.getCooldownElseNew(COOLDOWN_KEY, player.getUniqueId().toString());
+            final long duration = BukkitUtility.getPermissionValue(player, "pp.nophantoms.cooldown.")
+                    .map(value -> value * 1000) // Convert to milliseconds
+                    .orElse(plugin.config.command_cooldown.toMillis());
+            if (cooldown.isOnCooldownStart(duration)) return;
+        }
+
+        // Edit
+        final boolean newStatus = editKey(player, enablePhantoms);
+        plugin.getMessages().get().nophantoms.self.newMessage()
+                .replace("%status%", newStatus, DefaultReplaceType.BOOLEAN)
+                .send(sender);
     }
 
     /**
@@ -166,7 +154,7 @@ public class NoPhantomsCmd extends AnnoyingCommand {
      *
      * @param   offline         the player to edit the key status for
      *
-     * @param   enablePhantoms  whether to enable or disable phantoms for the player
+     * @param   enablePhantoms  whether to enable or disable phantoms for the player. {@code null} = toggle
      *
      * @return                  the new status of the key (true if phantoms enabled, false if disabled)
      */

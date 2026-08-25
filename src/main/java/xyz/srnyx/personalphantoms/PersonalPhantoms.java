@@ -5,14 +5,17 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.Statistic;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
-
 import org.jetbrains.annotations.NotNull;
-
 import xyz.srnyx.annoyingapi.AnnoyingPlugin;
-import xyz.srnyx.annoyingapi.PluginPlatform;
 import xyz.srnyx.annoyingapi.data.StringData;
 import xyz.srnyx.annoyingapi.scheduler.TaskWrapper;
+import xyz.srnyx.annoyingapi.utility.DurationUtility;
+import xyz.srnyx.personalphantoms.config.ConfigYml;
+import xyz.srnyx.personalphantoms.config.serdes.StatisticTaskDelaySerializer;
+import xyz.srnyx.personalphantoms.messages.PersonalMessagesProvider;
+import xyz.srnyx.personalphantoms.stats.FastStats;
 
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -25,33 +28,44 @@ public class PersonalPhantoms extends AnnoyingPlugin {
 
     public PersonalPhantoms() {
         options
-                .pluginOptions(pluginOptions -> pluginOptions.updatePlatforms(
-                        PluginPlatform.modrinth("lzjYdd5h"),
-                        PluginPlatform.hangar(this),
-                        PluginPlatform.spigot("106381")))
-                .bStatsOptions(bStatsOptions -> bStatsOptions.id(18328))
+                .statsOptions(statsOptions -> statsOptions
+                        .bStats(bStatsOptions -> bStatsOptions.id(18328))
+                        .fastStats(fastStatsOptions -> fastStatsOptions.loader(FastStats.class)))
                 .dataOptions(dataOptions -> dataOptions
-                        .enabled(true)
                         .entityDataColumns(KEY))
-                .registrationOptions
-                .automaticRegistration(automaticRegistration -> automaticRegistration.packages(
-                        "xyz.srnyx.personalphantoms.commands",
-                        "xyz.srnyx.personalphantoms.listeners"))
-                .papiExpansionToRegister(() -> new PersonalPlaceholders(this));
+                .registrationOptions.papiExpansionToRegister(() -> new PersonalPlaceholders(this));
+    }
+
+    @Override @NotNull
+    public PersonalMessagesProvider getMessages() {
+        return (PersonalMessagesProvider) super.getMessages();
+    }
+
+    @Override
+    public void load() {
+        config = configLoader.build(builder -> builder
+                .config(new ConfigYml())
+                .configure(configure -> configure.serdes(new StatisticTaskDelaySerializer())));
     }
 
     @Override
     public void enable() {
-        reload();
+        startTasks();
     }
 
     @Override
     public void reload() {
-        config = new ConfigYml(this);
+        config.reload();
+        startTasks();
+    }
+
+    private void startTasks() {
+        // Cancel previous tasks
+        for (final TaskWrapper task : tasks.values()) task.cancel();
 
         // Start tasks
-        final Long delay = config.statisticTask.delay;
-        final long period = config.statisticTask.period;
+        final Duration delay = config.statistic_task.delay.delay();
+        final Duration period = config.statistic_task.period;
         for (final World world : Bukkit.getWorlds()) {
             final String name = world.getName();
             if (!isWhitelistedWorld(world)) continue;
@@ -70,11 +84,14 @@ public class PersonalPhantoms extends AnnoyingPlugin {
             if (isNight) resetAllStatistics(world);
 
             // Get delay
-            Long worldDelay = delay; // Configured specific delay
-            if (worldDelay == null) worldDelay = isNight ? 36000 - time : 12000 - time; // Automatic calculation
+            Duration worldDelay = delay; // Configured specific delay
+            if (worldDelay == null) worldDelay = DurationUtility.ticksToDuration(isNight ? 36000 - time : 12000 - time); // Automatic calculation
 
             // Start periodic task
-            tasks.put(name, scheduler.runGlobalTaskTimer(() -> resetAllStatistics(world), worldDelay, period));
+            tasks.put(name, scheduler.runGlobalTaskTimer(
+                    task -> resetAllStatistics(world),
+                    worldDelay.toSeconds() / 50,
+                    period.toMillis() / 50));
         }
     }
 
@@ -93,7 +110,7 @@ public class PersonalPhantoms extends AnnoyingPlugin {
     }
 
     public boolean isWhitelistedWorld(@NotNull World world) {
-        return config.worldsBlacklist.list == null || config.worldsBlacklist.list.contains(world.getName()) == config.worldsBlacklist.treatAsWhitelist;
+        return config.worlds_blacklist.list.contains(world.getName()) == config.worlds_blacklist.treat_as_whitelist;
     }
 
     public static void resetStatistic(@NotNull Player player) {
